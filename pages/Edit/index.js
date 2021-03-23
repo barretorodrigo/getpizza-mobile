@@ -1,30 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { View, Image } from 'react-native';
 import { Header, Input, Button, Icon } from 'react-native-elements';
 import api from '../../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import useAuth from '../../hooks/useAuth';
 import { Formik } from 'formik';
 import styles from '../Edit/styles';
 
 const Edit = ({ route, navigation }) => {
     const initialValues = {
-        name: '',
-        description: '',
-    }
+        name: route?.params == undefined ?'': route?.params?.name,
+        description: route?.params == undefined ?'': route?.params?.description
+  }
 
     const auth = useAuth();
-    const [productName, setProductName] = useState(route?.params?.name);
-    const [productDescription, setProductDescription] = useState(route?.params?.description);
-    const [token, setToken] = useState();
 
     const saveProduct = async (values) => {
         try {
-
-            // const body = {
-            //     name: productName,
-            //     description: productDescription
-            // }
             await api.put(`/products/${route.params.id}`, values, {
                 headers: { 'x-access-token': auth?.token }
             });
@@ -36,11 +27,18 @@ const Edit = ({ route, navigation }) => {
 
     const createProduct = async (values) => {
         try {
-            // const body = {
-            //     name: productName,
-            //     description: productDescription
-            // }
             await api.post(`/products/`, values, {
+                headers: { 'x-access-token': auth?.token }
+            });
+            navigation.goBack();
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const deleteProduct = async()=>{
+        try {
+            await api.delete(`/products/${route.params.id}`,{
                 headers: { 'x-access-token': auth?.token }
             });
             navigation.goBack();
@@ -52,19 +50,6 @@ const Edit = ({ route, navigation }) => {
     const sendInformation = (values)=>{
         return route.params == undefined ? createProduct(values) : saveProduct(values);
     }
-
-    // const getToken = async () => {
-    //     try {
-    //         setToken(await AsyncStorage.getItem('token'));
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
-
-    // useEffect(()=>{
-    //     getToken();
-    // },[auth])
-
 
     return (
         <View>
@@ -114,8 +99,12 @@ const Edit = ({ route, navigation }) => {
                     />
                     <Button
                         title={route.params == undefined ? "Criar" : "Salvar"}
-                        // onPress={route.params == undefined ? createProduct : saveProduct}
                         onPress={handleSubmit}
+                    />
+                    <Button 
+                        title={"Deletar"}
+                        onPress={deleteProduct}
+                        style={{backgroundColor:'red'}}
                     />
                 </View>
                 )
