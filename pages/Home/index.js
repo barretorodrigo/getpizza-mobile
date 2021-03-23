@@ -70,7 +70,7 @@ const App = () => {
           >
             <Menu.Item title='Sair' onPress={() => logoff()} />
             {auth?.type === 'admin' ?
-              <Menu.Item title='Cadastrar Pizza' onPress={() => console.log("abrir cadastrar pizza")} /> :
+              <Menu.Item title='Cadastrar Pizza' onPress={() => navigation.navigate('Edit')} /> :
               null}
 
           </Menu>
